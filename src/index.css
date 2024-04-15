@@ -48,3 +48,25 @@
     --ring: 240 4.9% 83.9%;
   }
 }
+
+@layer utilities {
+  .scrollbar::-webkit-scrollbar {
+    @apply h-5 w-1;
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+    @apply rounded-full bg-gray-100 dark:bg-gray-200;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-gray-200 dark:bg-gray-200;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-200;
+  }
+}
+
+html {
+  @apply overflow-hidden;
+}
