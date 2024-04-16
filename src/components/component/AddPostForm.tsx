@@ -12,26 +12,37 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { postAdded } from '@/features/posts/postsSlice'
+import { addNewPost } from '@/features/posts/postsSlice'
 import { selectAllUsers } from '@/features/users/usersSlice'
+import { type AppDispatch } from '@/store'
 
 export default function AddPostForm() {
   const users = useSelector(selectAllUsers)
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
 
   const [title, setTitle] = useState('')
   const [userId, setUserId] = useState('')
   const [content, setContent] = useState('')
+  const [addRequestStatus, setAddRequestStatus] = useState('idle')
 
   const resetForm = () => {
     setTitle('')
     setUserId('')
     setContent('')
   }
+
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    dispatch(postAdded(title, content, userId))
-    resetForm()
+    try {
+      setAddRequestStatus('pending')
+      void dispatch(addNewPost({ title, body: content, userId })).unwrap()
+      resetForm()
+    } catch (err) {
+      console.error('Failed to save the post', err)
+    } finally {
+      setAddRequestStatus('idle')
+      resetForm()
+    }
   }
 
   return (
@@ -40,13 +51,17 @@ export default function AddPostForm() {
         <Label className="text-xl" htmlFor="select">
           Select Option
         </Label>
-        <Select value={userId} onValueChange={setUserId}>
+        <Select
+          onValueChange={value => {
+            setUserId(value)
+          }}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select a user" />
           </SelectTrigger>
           <SelectContent>
             {users.map(user => (
-              <SelectItem key={user.id} value={user.id}>
+              <SelectItem key={user.id} value={JSON.stringify(user.id)}>
                 {user.name}
               </SelectItem>
             ))}
@@ -82,7 +97,9 @@ export default function AddPostForm() {
           required
         />
       </div>
-      <Button type="submit">Submit</Button>
+      <Button disabled={addRequestStatus === 'pending'} type="submit">
+        Submit
+      </Button>
     </form>
   )
 }

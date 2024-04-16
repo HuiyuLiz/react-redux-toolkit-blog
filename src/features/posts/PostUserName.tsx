@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { selectAllUsers } from '../users/usersSlice'
 
 interface PostUserNameProps {
-  userId: string
+  userId: number
 }
 
 export function PostUserName({ userId }: PostUserNameProps) {

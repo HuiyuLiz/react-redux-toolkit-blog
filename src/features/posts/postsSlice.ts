@@ -1,11 +1,13 @@
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { createSlice, nanoid } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice, nanoid } from '@reduxjs/toolkit'
+
+import { createPost, getPosts } from '@/api/posts'
 
 export interface Post {
   id: string
-  userId: string
+  userId: number
   title: string
-  content: string
+  body: string
   reactions: {
     thumbsUp: number
     heart: number
@@ -14,34 +16,37 @@ export interface Post {
 
 export interface PostsState {
   data: Post[]
+  status: 'idle' | 'pending' | 'succeeded' | 'failed'
+  error: string | undefined
 }
 
+export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
+  const response = await getPosts()
+  return response
+})
+
+export const addNewPost = createAsyncThunk(
+  'posts/createPost',
+  async ({
+    title,
+    body,
+    userId
+  }: {
+    title: string
+    body: string
+    userId: string
+  }) => {
+    const response = await createPost({ title, body, userId })
+    return response
+  }
+)
+
 const initialState: PostsState = {
-  data: [
-    {
-      id: '1',
-      userId: '1',
-      title: 'Redux Toolkit',
-      content:
-        'Redux Toolkit provides utilities for simplifying common Redux tasks, including creating slice reducers, async thunks, and immutable update logic.',
-      reactions: {
-        thumbsUp: 0,
-        heart: 0
-      }
-    },
-    {
-      id: '2',
-      userId: '2',
-      title: 'React.js',
-      content:
-        'React.js is a JavaScript library for building user interfaces. It lets you create reusable components that efficiently update based on data changes.',
-      reactions: {
-        thumbsUp: 0,
-        heart: 0
-      }
-    }
-  ]
-}
+  data: [],
+  status: 'idle',
+  error: ''
+} satisfies PostsState
+
 export const postsSlice = createSlice({
   name: 'posts',
   initialState,
@@ -78,10 +83,42 @@ export const postsSlice = createSlice({
         ]++
       }
     }
+  },
+  extraReducers: builder => {
+    builder
+      .addCase(fetchPosts.pending, state => {
+        state.status = 'pending'
+      })
+      .addCase(fetchPosts.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        const loadedPosts = action.payload.map(post => {
+          post.reactions = {
+            thumbsUp: Math.floor(Math.random() * 100),
+            heart: Math.floor(Math.random() * 100)
+          }
+          return post
+        })
+        state.data = loadedPosts
+      })
+      .addCase(fetchPosts.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message
+      })
+      .addCase(addNewPost.fulfilled, (state, action) => {
+        action.payload.userId = Number(action.payload.userId)
+        action.payload.reactions = {
+          thumbsUp: 0,
+          heart: 0
+        }
+        state.data.push(action.payload)
+      })
   }
 })
 
 export const selectAllPosts = (state: { posts: PostsState }) => state.posts.data
+export const getPostsStatus = (state: { posts: PostsState }) =>
+  state.posts.status
+export const getPostsError = (state: { posts: PostsState }) => state.posts.error
 
 // Action creators are generated for each case reducer function
 export const { postAdded, reactionAdded } = postsSlice.actions

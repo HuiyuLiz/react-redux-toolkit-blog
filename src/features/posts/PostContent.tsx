@@ -18,7 +18,7 @@ export default function PostContent({ post }: PostProps) {
         </p>
       </div>
       <div className="prose prose-gray max-w-none not-italic">
-        <p>{post.content}</p>
+        <p>{post.body}</p>
       </div>
       <div>
         <ReactionButtons post={post}></ReactionButtons>
