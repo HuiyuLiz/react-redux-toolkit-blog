@@ -55,13 +55,13 @@ export const postsSlice = createSlice({
       reducer: (state, action: PayloadAction<Post>) => {
         state.data.push(action.payload)
       },
-      prepare: (title: string, content: string, userId: string) => {
+      prepare: (title: string, body: string, userId: number) => {
         const id = nanoid()
         return {
           payload: {
             id,
             title,
-            content,
+            body,
             userId,
             reactions: {
               thumbsUp: 0,
