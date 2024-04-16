@@ -1,5 +1,5 @@
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { createAsyncThunk, createSlice, nanoid } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 import { createPost, getPosts } from '@/api/posts'
 
@@ -51,26 +51,6 @@ export const postsSlice = createSlice({
   name: 'posts',
   initialState,
   reducers: {
-    postAdded: {
-      reducer: (state, action: PayloadAction<Post>) => {
-        state.data.push(action.payload)
-      },
-      prepare: (title: string, body: string, userId: number) => {
-        const id = nanoid()
-        return {
-          payload: {
-            id,
-            title,
-            body,
-            userId,
-            reactions: {
-              thumbsUp: 0,
-              heart: 0
-            }
-          }
-        }
-      }
-    },
     reactionAdded: (
       state,
       action: PayloadAction<{ postId: string; reaction: string }>
@@ -121,6 +101,6 @@ export const getPostsStatus = (state: { posts: PostsState }) =>
 export const getPostsError = (state: { posts: PostsState }) => state.posts.error
 
 // Action creators are generated for each case reducer function
-export const { postAdded, reactionAdded } = postsSlice.actions
+export const { reactionAdded } = postsSlice.actions
 
 export default postsSlice.reducer
