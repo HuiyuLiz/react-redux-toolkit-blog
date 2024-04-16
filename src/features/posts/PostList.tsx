@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import AddPostForm from '@/components/component/AddPostForm'
 import { type AppDispatch } from '@/store'
 
+import { fetchUsers } from '../users/usersSlice'
 import PostContent from './PostContent'
 import {
   fetchPosts,
@@ -44,6 +45,7 @@ export function PostList() {
   useEffect(() => {
     if (postStatus === 'idle') {
       void dispatch(fetchPosts())
+      void dispatch(fetchUsers())
     }
   }, [postStatus, dispatch])
 
