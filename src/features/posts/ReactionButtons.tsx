@@ -2,6 +2,7 @@ import { useDispatch } from 'react-redux'
 
 import { Button } from '@/components/ui/button'
 import { reactionAdded } from '@/features/posts/postsSlice'
+import { type AppDispatch } from '@/store'
 
 import { type Post } from './postsSlice'
 
@@ -15,16 +16,16 @@ const reactionEmoji: Record<string, string> = {
 }
 
 export default function ReactionButtons({ post }: ReactionButtonsProps) {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
 
   const reactionButtons = Object.entries(reactionEmoji).map(([name, emoji]) => {
     return (
       <Button
         key={name}
         variant={'ghost'}
-        onClick={() =>
-          dispatch(reactionAdded({ postId: post.id, reaction: name }))
-        }
+        onClick={() => {
+          void dispatch(reactionAdded({ postId: post.id, reaction: name }))
+        }}
       >
         {emoji} {post.reactions[name as keyof typeof post.reactions]}
       </Button>
