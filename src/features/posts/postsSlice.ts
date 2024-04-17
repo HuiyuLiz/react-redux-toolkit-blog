@@ -34,7 +34,7 @@ export const addNewPost = createAsyncThunk(
   }: {
     title: string
     body: string
-    userId: string
+    userId: number
   }) => {
     const response = await createPost({ title, body, userId })
     return response

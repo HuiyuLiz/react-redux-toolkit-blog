@@ -15,7 +15,7 @@ export async function createPost({
 }: {
   title: string
   body: string
-  userId: string
+  userId: number
 }): Promise<Post> {
   return (await request({
     url: '/posts',

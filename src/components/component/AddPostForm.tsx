@@ -31,11 +31,19 @@ export default function AddPostForm() {
     setContent('')
   }
 
+  const validateForm =
+    [title, content, userId].every(Boolean) && addRequestStatus === 'idle'
+
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (!validateForm) {
+      return
+    }
     try {
       setAddRequestStatus('pending')
-      void dispatch(addNewPost({ title, body: content, userId })).unwrap()
+      void dispatch(
+        addNewPost({ title, body: content, userId: Number(userId) })
+      ).unwrap()
       resetForm()
     } catch (err) {
       console.error('Failed to save the post', err)
@@ -52,6 +60,7 @@ export default function AddPostForm() {
           Select Option
         </Label>
         <Select
+          value={userId}
           onValueChange={value => {
             setUserId(value)
           }}
@@ -97,7 +106,7 @@ export default function AddPostForm() {
           required
         />
       </div>
-      <Button disabled={addRequestStatus === 'pending'} type="submit">
+      <Button disabled={!validateForm} type="submit">
         Submit
       </Button>
     </form>
